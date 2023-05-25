@@ -15,68 +15,122 @@ app.use(bodyParser.json())
 const { MongoClient } = require("mongodb");
 
 const client = new MongoClient(config.finalUrl);
-
-//database to use
-const dbName = "augustTest";
+const dbName = 'API_Structuur'
 
 //mongo test
 async function getUsers() {
   try {
-    // Connect the client to the server
-    await client.connect();
-    console.log("You successfully connected to MongoDB!");
-    const db = client.db(dbName);
-    const col = db.collection("testCollection");
-    
-
-    let newUser = {
-        userName: "Grant Lift",
-        likedGames:["FFXIV","Monster Hunter World","Age of Empires II"] 
-    }
-
-    // Insert a single document, wait for promise so we can read it back
-    //const p = await col.insertOne(newUser);
-    // Find one document
-    const myDoc = await col.findOne();
-    // Print to the console
-    console.log(myDoc);
-    return await col.find().toArray();
+      await client.connect();
+      const db = client.db(dbName);
+      const col = db.collection("Users");
+      return await col.find().toArray();
   } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+      await client.close();
+  }
+}
+
+async function registerUser() {
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection("Users");
+        const saveUser = {UserId:user.UserId, name: user.name, email: user.email, password: user.password}
+        return col.insertOne(saveUser)
+    } finally {
+        await client.close();
+    }
+}
+
+async function getWeapons() {
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection("Greatswords");
+        return await col.find().toArray();
+    } finally {
+        await client.close();
+    }
+}
+
+async function getHunts() {
+  try {
+      await client.connect();
+      const db = client.db(dbName);
+      const col = db.collection("Hunts");
+      return await col.find().toArray();
+  } finally {
+      await client.close();
+  }
+}
+
+async function getMonsters() {
+  try {
+      await client.connect();
+      const db = client.db(dbName);
+      const col = db.collection("Monsters");
+      return await col.find().toArray();
+  } finally {
+      await client.close();
+  }
+}
+
+async function getUserGreatswords() {
+  try {
+      await client.connect();
+      const db = client.db(dbName);
+      const col = db.collection("Users_Greatswords");
+      return await col.find().toArray();
+  } finally {
+      await client.close();
+  }
+}
+
+async function getUserHunts() {
+  try {
+      await client.connect();
+      const db = client.db(dbName);
+      const col = db.collection("User_Hunts");
+      return await col.find().toArray();
+  } finally {
+      await client.close();
   }
 }
 
 
-app.get('/users/', async (_, response) => {
+//Get all users
+app.get('/users', async (_, response) => {
     await getUsers().then(users => response.send(users))
 });
 
+//register user
+app.post('/users', async (request, response) => {
+  registerUser(request.body).then(user => response.send(user))
+});
 
+//get all weapons
+app.get('/weapons', async (_, response) => {
+    await getWeapons().then(weapons => response.send(weapons))
+});
 
+//get all hunts
+app.get('/hunts', async (_, response) => {
+  await getHunts().then(hunts => response.send(hunts))
+});
 
-app.get('/', (req, res) => {
-    console.log("Local")
-    res.redirect('/info.html')
-  })
-  
-  app.get('/test', (req, res) => {
-    res.send('Test succeeded!')
-  })
-  
-  app.get('/data', (req, res) => {
-    let exampleData = {
-      name: 'Axel',
-      age: 25
-    }
-    res.send(exampleData)
-  })
-  
-  app.post('/saveData', (req, res) => {
-    console.log(req.body);
-  
-    res.send( `Data received with id: ${req.body.id}`);
-  })
+//get all monsters
+app.get('/monsters', async (_, response) => {
+  await getMonsters().then(monsters => response.send(monsters))
+});
+
+//get all user_greatswords
+app.get('/user_greatswords', async (_, response) => {
+  await getUserGreatswords().then(user_greatswords => response.send(user_greatswords))
+});
+
+//get all user_hunts
+app.get('/user_hunts', async (_, response) => {
+  await getUserHunts().then(user_hunts => response.send(user_hunts))
+});
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
