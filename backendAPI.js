@@ -1,12 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
+const port = process.env.port || 3000;
 const config = require('./config.json');
 
 //cors
 const cors = require('cors');
-app.use(cors())
+app.use(cors());
 
 app.use(express.static('public'));
 app.use(bodyParser.json())
@@ -139,7 +139,7 @@ app.get('/users', async (_, response) => {
 });
 
 //Get one user 
-app.get('/users/:UserId', async (request, response) => {
+app.get('/users/:userid', async (request, response) => {
   await getOneUser(request.params.UserId).then(user => response.send(user))
 });
 
@@ -161,7 +161,7 @@ app.get('/monsters', async (_, response) => {
 });
 
 //get one monster
-app.get('/monsters/:MonsterI', async (request, response) => {
+app.get('/monsters/:monsterid', async (request, response) => {
   await getOneMonster(request.params.MonsterId).then(monster => response.send(monster))
 });
 
