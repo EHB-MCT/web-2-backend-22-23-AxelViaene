@@ -1,0 +1,6 @@
+{
+    "username": "axelviaene",
+    "password": "admin",
+    "dbName": "augustTest",
+    "finalUrl": "mongodb+srv://axelviaene:admin@session7.5nyu1qd.mongodb.net/augustTest?retryWrites=true&w=majority"
+}
