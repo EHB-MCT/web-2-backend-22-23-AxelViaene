@@ -170,7 +170,7 @@ app.get('/user', async(req,res) => {
   try{
     await client.connect();
     const col = client.db(dbName).collection("Users");
-    const query = { UserId: req.query.userid};
+    const query = { UserId: Number(req.query.userid)};
     console.log(query)
     console.log(req.query)
     console.log(req.query.UserId)
