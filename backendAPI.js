@@ -128,7 +128,6 @@ app.get('/weapon', async (req, res) => {
     await client.connect();
     const col = client.db(dbName).collection('Greatswords');
     const query = { GreatswordId: Number(req.query.weaponid)};
-    console.log(query)
     const monster = await col.findOne(query);
 
     if(monster) {
