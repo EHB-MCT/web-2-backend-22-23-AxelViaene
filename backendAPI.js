@@ -186,6 +186,11 @@ app.delete('/user_greatswords/delete', async (request, response) => {
   await deleteWeapon(request.params.UserGreatswordId).then(response.sendStatus(200));
 });
 
+app.get('/', (req, res) => {
+  console.log("Local")
+  res.redirect('/info.html')
+})
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
   })
