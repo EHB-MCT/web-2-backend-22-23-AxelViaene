@@ -150,15 +150,23 @@ async function deleteWeapon(UserGreatswordId) {
 //     await getUsers().then(users => response.send(users))
 // });
 
-app.get('/users', async(_, response) => {
+app.get('/users', async(req, res) => {
   try {
     await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection("Users");
-    return await col.find().toArray();
-} finally {
+    const col = client.db(dbName).collection("Users");
+    const users = await col.find({}).toArray();
+    res.status(200).send(users)
+  } 
+  catch(error) {
+  console.log(error)
+  res.status(500).send({
+    error: 'Something went wrong',
+    value: error
+  });
+  } 
+  finally {
     await client.close();
-}
+  }
 })
 
 //Get one user 
