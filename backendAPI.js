@@ -293,8 +293,44 @@ app.get('/monster', async (req,res) => {
 });
 
 //save one monster
-app.post('/monsters/post', (request, response) => {
-saveMonster(request.body).then(monster => response.send(monster))
+// app.post('/monsters/post', (request, response) => {
+// saveMonster(request.body).then(monster => response.send(monster))
+// })
+
+app.post('/savemonster', async (req, res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection('Monsters');
+
+    //check for duplicates
+    const monster = await col.findOne({MonsterId: req.body.MonsterId});
+    if(monster) {
+      res.status(400).send('Bad request: Monster already in database with MonsterId: ' + req.body.MonsterId)
+      return
+    }
+    let newMonster = {
+      name: req.body.name,
+      description: req.body.description,
+      MonsterId: req.body.MonsterId,
+      locations: req.body.locations,
+      resistances: req.body.resistances,
+      weaknesses: req.body.weaknesses
+    }
+
+    //insert in database
+    let insertResult = await col.insertOne(newMonster);
+    res.status(201).send(`Monster saved with MonsterId ${req.body.MonsterId}`);
+  }
+  catch(error) {
+    console.log(error)
+    res.status(500).send({
+      error: 'Something went wrong',
+      value: error
+    });
+  }
+  finally {
+    await client.close();
+}
 })
 
 // ----LINKED-TABLES-----//
@@ -374,10 +410,6 @@ finally {
 })
 
 //delete one user_greatsword
-// app.delete('/user_greatswords/delete', async (request, response) => {
-//   await deleteWeapon(request.params.UserGreatswordId).then(response.sendStatus(200));
-// });
-
 app.delete('/delete_user_greatsword', async (req, res) => {
   try {
     await client.connect();
