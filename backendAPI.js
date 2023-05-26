@@ -292,10 +292,6 @@ saveMonster(request.body).then(monster => response.send(monster))
 
 // ----LINKED-TABLES-----//
 //get all hunts
-// app.get('/hunts', async (_, response) => {
-//   await getHunts().then(hunts => response.send(hunts))
-// });
-
 app.get('/hunts', async(req, res) => {
   try {
     await client.connect();
@@ -316,9 +312,28 @@ app.get('/hunts', async(req, res) => {
 })
 
 //get all user_greatswords
-app.get('/user_greatswords', async (_, response) => {
-  await getUserGreatswords().then(user_greatswords => response.send(user_greatswords))
-});
+// app.get('/user_greatswords', async (_, response) => {
+//   await getUserGreatswords().then(user_greatswords => response.send(user_greatswords))
+// });
+
+app.get('/user_greatswords', async (req,res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection("Users_Greatswords");
+    const users_greatswords = await col.find({}).toArray();
+    res.status(200).send(users_greatswords);
+  } 
+  catch(error) {
+  console.log(error)
+  res.status(500).send({
+    error: 'Something went wrong',
+    value: error
+  });
+  } 
+  finally {
+    await client.close();
+  }
+})
 
 //delete one user_greatsword
 app.delete('/user_greatswords/delete', async (request, response) => {
