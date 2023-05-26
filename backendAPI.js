@@ -245,11 +245,6 @@ app.get('/weapons', async (req, res) => {
 
 // ----MONSTERS-----//
 //get all monsters
-// app.get('/monsters', async (_, response) => {
-//   await getMonsters().then(monsters => response.send(monsters))
-// });
-
-//get all monsters
 app.get('/monsters', async (req,res) => {
   try{
     await client.connect();
@@ -270,12 +265,24 @@ app.get('/monsters', async (req,res) => {
 });
 
 //get one monster
-// app.get('/monsters/:monsterid', async (request, response) => {
-//   await getOneMonster(request.params.MonsterId).then(monster => response.send(monster))
-// });
+app.get('/monsters/:monsterid', async (req,res) => {
+ try {
+  await client.connect();
+  const col = client.db(dbName).collection("Monsters");
+  const query = {MonsterId: Number(req.query.monsterid)};
 
-app.get('/monsters/:monsterid', async (request, response) => {
- 
+  const monster = await col.findOne(query);
+
+  if(monster){
+    res.status(200).send(monster);
+    return;
+  } else {
+    res.status(400).send('not found with id: ' + req.query.monsterid)
+  }
+ }
+ finally {
+  await client.close();
+}
 });
 
 //save one monster
