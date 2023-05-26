@@ -170,17 +170,18 @@ app.get('/user', async(req,res) => {
   try{
     await client.connect();
     const col = client.db(dbName).collection("Users");
-    const query = {UserId: req.query.UserId};
-    const options = {
-      // projection: {_id: 0 }
-    };
-    const user = await col.findOne(query, options);
+    const query = { UserId: req.query.userid};
+    console.log(query)
+    console.log(req.query)
+    console.log(req.query.UserId)
+   
+    const user = await col.findOne(query);
 
     if(user){
       res.status(200).send(user);
       return;
     } else {
-      res.status(400).send('not found with id: ' + req.query.UserId)
+      res.status(400).send('not found with id: ' + req.query.userid)
     }
   }
   finally {
