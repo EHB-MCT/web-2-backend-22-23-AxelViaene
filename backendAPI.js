@@ -13,7 +13,6 @@ app.use(bodyParser.json());
 
 //create client
 const { MongoClient } = require("mongodb");
-const { diffieHellman } = require('crypto');
 
 const client = new MongoClient(config.finalUrl);
 const dbName = 'API_Structuur'
@@ -30,16 +29,16 @@ async function getUsers() {
   }
 }
 
-async function getOneUser(UserId) {
-  try {
-    await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection("Users");
-    return await col.findOne(UserId);
-  } finally {
-    await client.close();
-  }
-}
+// async function getOneUser(UserId) {
+//   try {
+//     await client.connect();
+//     const db = client.db(dbName);
+//     const col = db.collection("Users");
+//     return await col.findOne(UserId);
+//   } finally {
+//     await client.close();
+//   }
+// }
 
 async function registerUser(user) {
     try {
@@ -53,17 +52,17 @@ async function registerUser(user) {
     }
 }
 
-async function saveUser() {
-  try {
-    await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection("Users");
-    console.log(req.body);
-    res.send(`data received with ${req.body.name}`);
-  } finally {
-    await client.close();
-  }
-}
+// async function saveUser() {
+//   try {
+//     await client.connect();
+//     const db = client.db(dbName);
+//     const col = db.collection("Users");
+//     console.log(req.body);
+//     res.send(`data received with ${req.body.name}`);
+//   } finally {
+//     await client.close();
+//   }
+// }
 
 async function getWeapons() {
     try {
@@ -147,9 +146,20 @@ async function deleteWeapon(UserGreatswordId) {
 
 // -----USERS-----//
 //Get all users
-app.get('/users', async (_, response) => {
-    await getUsers().then(users => response.send(users))
-});
+// app.get('/users', async (_, response) => {
+//     await getUsers().then(users => response.send(users))
+// });
+
+app.get('/users', async(_, response) => {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection("Users");
+    return await col.find().toArray();
+} finally {
+    await client.close();
+}
+})
 
 //Get one user 
 // app.get('/users/:userid', async (request, response) => {
