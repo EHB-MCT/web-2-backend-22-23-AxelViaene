@@ -11,10 +11,28 @@
 
 <body>
     <h1>API Documentation</h1>
+    <p>GET / = root page (this page)</p>
     <ul>
-        <li>GET / = root info page</li>
-        <li>GET /test = a test string</li>
-        <li>GET /data = a random JSON object</li>
+        <h2>USERS</h2>
+        <li>GET /users = get all users</li>
+        <li>GET /users/:userid = get one user</li>
+        <li>POST /users/register = register user</li>
+    </ul>
+    <ul>
+        <h2>WEAPONS</h2>
+        <li>GET /weapons = get all weapons</li>
+    </ul>
+    <ul>
+        <h2>MONSTERS</h2>
+        <li>GET /monsters = get all monsters</li>
+        <li>GET /users/:monsterid = get one monster</li>
+        <li>POST /users/post = save one monster</li>
+    </ul>
+    <ul>
+        <h2>LINKED TABLES</h2>
+        <li>GET /hunts = get all hunts</li>
+        <li>GET /user_greatswords = get all user_greatswords</li>
+        <li>DELETE /user_greatswords/delete = delete one user_greatswords</li>
     </ul>
 </body>
 
