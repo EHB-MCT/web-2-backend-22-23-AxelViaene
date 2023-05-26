@@ -292,9 +292,28 @@ saveMonster(request.body).then(monster => response.send(monster))
 
 // ----LINKED-TABLES-----//
 //get all hunts
-app.get('/hunts', async (_, response) => {
-  await getHunts().then(hunts => response.send(hunts))
-});
+// app.get('/hunts', async (_, response) => {
+//   await getHunts().then(hunts => response.send(hunts))
+// });
+
+app.get('/hunts', async(req, res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection("Hunts");
+    const hunts = await col.find({}).toArray();
+    res.status(200).send(hunts);
+  }
+  catch(error) {
+    console.log(error)
+    res.status(500).send({
+      error: 'Something went wrong',
+      value: error
+    });
+    } 
+    finally {
+      await client.close();
+    }
+})
 
 //get all user_greatswords
 app.get('/user_greatswords', async (_, response) => {
