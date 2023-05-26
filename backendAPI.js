@@ -265,7 +265,7 @@ app.get('/monsters', async (req,res) => {
 });
 
 //get one monster
-app.get('/monsters/:monsterid', async (req,res) => {
+app.get('/monster', async (req,res) => {
  try {
   await client.connect();
   const col = client.db(dbName).collection("Monsters");
