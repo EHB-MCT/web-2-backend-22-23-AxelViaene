@@ -180,7 +180,7 @@ app.get('/user', async(req,res) => {
       res.status(200).send(user);
       return;
     } else {
-      res.status(400).send('not found with id: ' + req.query.id)
+      res.status(400).send('not found with id: ' + req.query.UserId)
     }
   }
   finally {
