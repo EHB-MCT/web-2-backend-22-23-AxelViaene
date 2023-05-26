@@ -246,7 +246,7 @@ app.post('/saveUsers', async (req, res) => {
 app.get('/weapons', async (req, res) => {
   try {
     await client.connect();
-    const col = client.db(dbName).collection('Monsters');
+    const col = client.db(dbName).collection('Greatswords');
     const weapons = await col.find({}).toArray();
     res.status(200).send(weapons)
   }
