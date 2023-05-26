@@ -249,10 +249,10 @@ app.get('/weapons', async (req, res) => {
 // });
 
 //get all monsters
-app.get('/monster', async (req,res) => {
+app.get('/monsters', async (req,res) => {
   try{
     await client.connect();
-    const col = client.db(dbName).collection("Monster");
+    const col = client.db(dbName).collection("Monsters");
     const monsters = await col.find({}).toArray();
     res.status(200).send(monsters);
   }
@@ -269,6 +269,10 @@ app.get('/monster', async (req,res) => {
 });
 
 //get one monster
+// app.get('/monsters/:monsterid', async (request, response) => {
+//   await getOneMonster(request.params.MonsterId).then(monster => response.send(monster))
+// });
+
 app.get('/monsters/:monsterid', async (request, response) => {
   await getOneMonster(request.params.MonsterId).then(monster => response.send(monster))
 });
