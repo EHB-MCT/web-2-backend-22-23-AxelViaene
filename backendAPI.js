@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 
 //create client
 const { MongoClient } = require("mongodb");
+const { diffieHellman } = require('crypto');
 
 const client = new MongoClient(config.finalUrl);
 const dbName = 'API_Structuur'
@@ -40,7 +41,7 @@ async function getOneUser(UserId) {
   }
 }
 
-async function registerUser() {
+async function registerUser(user) {
     try {
         await client.connect();
         const db = client.db(dbName);
@@ -50,6 +51,18 @@ async function registerUser() {
     } finally {
         await client.close();
     }
+}
+
+async function saveUser() {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection("Users");
+    console.log(req.body);
+    res.send(`data received with ${req.body.name}`);
+  } finally {
+    await client.close();
+  }
 }
 
 async function getWeapons() {
@@ -139,9 +152,32 @@ app.get('/users', async (_, response) => {
 });
 
 //Get one user 
-app.get('/users/:userid', async (request, response) => {
-  await getOneUser(request.params.UserId).then(user => response.send(user))
-});
+// app.get('/users/:userid', async (request, response) => {
+//   await getOneUser(request.params.UserId).then(user => response.send(user))
+// });
+
+//ONE USER TEST
+app.get('/user', async(req,res) => {
+  try{
+    await client.connect();
+    const col = client.db(dbName).collection("Users");
+    const query = {UserId: 2};
+    const options = {
+      // projection: {_id: 0 }
+    };
+    const user = await col.findOne(query, options);
+
+    if(user){
+      res.status(200).send(user);
+      return;
+    } else {
+      res.status(400).send('not found with id: ' + req.query.id)
+    }
+  }
+  finally {
+    await client.close();
+}
+})
 
 //register user
 app.post('/users/register', async (request, response) => {
@@ -149,15 +185,63 @@ app.post('/users/register', async (request, response) => {
   registerUser(request.body).then(user => response.send(user))
 });
 
-app.post('/saveUser', (req, res) => {
-  console.log(req.body);
-  res.send(`data received with ${req.body.name}`)
+//NEW POST TEST
+app.post('/saveUsers', async (req, res) => {
+  try {
+    //connect to db and retrieve the right collection
+    await client.connect();
+    const col = client.db(dbName).collection('Users');
+
+    //check for duplicates
+    const user = await col.findOne({UserId: req.body.UserId});
+    if(user) {
+      res.status(400).send('Bad request: User already in database with UserId: ' + req.body.UserId)
+      return
+    }
+
+    //create new user object
+    let newUser = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      UserId: req.body.UserId
+    }
+
+    //insert in database
+    let insertResult = await col.insertOne(newUser)
+
+    //send back succesmessage
+    res.status(201).send(`User saved with UserId ${req.body.UserId}`);
+  
+  } finally {
+    await client.close();
+}
 })
 
 // ----WEAPONS-----//
 //get all weapons
-app.get('/weapons', async (_, response) => {
-    await getWeapons().then(weapons => response.send(weapons))
+// app.get('/weapons', async (_, response) => {
+//     await getWeapons().then(weapons => response.send(weapons))
+// });
+
+//weapons test
+app.get('/weapons', async (req, res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection('Monsters');
+    const weapons = await col.find({}).toArray();
+    res.status(200).send(weapons)
+  }
+  catch(error) {
+    console.log(error)
+    res.status(500).send({
+      error: 'Something went wrong',
+      value: error
+    });
+  }
+  finally {
+    await client.close();
+}
 });
 
 // ----MONSTERS-----//
