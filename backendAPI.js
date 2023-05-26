@@ -9,7 +9,7 @@ const cors = require('cors');
 app.use(cors());
 
 app.use(express.static('public'));
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 //create client
 const { MongoClient } = require("mongodb");
@@ -145,8 +145,14 @@ app.get('/users/:userid', async (request, response) => {
 
 //register user
 app.post('/users/register', async (request, response) => {
+  console.log(req.body);
   registerUser(request.body).then(user => response.send(user))
 });
+
+app.post('/saveUser', (req, res) => {
+  console.log(req.body);
+  res.send(`data received with ${req.body.name}`)
+})
 
 // ----WEAPONS-----//
 //get all weapons
