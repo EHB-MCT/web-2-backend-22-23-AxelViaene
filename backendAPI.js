@@ -18,131 +18,6 @@ const client = new MongoClient(config.finalUrl);
 const dbName = 'API_Structuur'
 
 
-async function getUsers() {
-  try {
-      await client.connect();
-      const db = client.db(dbName);
-      const col = db.collection("Users");
-      return await col.find().toArray();
-  } finally {
-      await client.close();
-  }
-}
-
-// async function getOneUser(UserId) {
-//   try {
-//     await client.connect();
-//     const db = client.db(dbName);
-//     const col = db.collection("Users");
-//     return await col.findOne(UserId);
-//   } finally {
-//     await client.close();
-//   }
-// }
-
-async function registerUser(user) {
-    try {
-        await client.connect();
-        const db = client.db(dbName);
-        const col = db.collection("Users");
-        const saveUser = {UserId: user.UserId, name: user.name, email: user.email, password: user.password}
-        return col.insertOne(saveUser)
-    } finally {
-        await client.close();
-    }
-}
-
-// async function saveUser() {
-//   try {
-//     await client.connect();
-//     const db = client.db(dbName);
-//     const col = db.collection("Users");
-//     console.log(req.body);
-//     res.send(`data received with ${req.body.name}`);
-//   } finally {
-//     await client.close();
-//   }
-// }
-
-async function getWeapons() {
-    try {
-        await client.connect();
-        const db = client.db(dbName);
-        const col = db.collection("Greatswords");
-        return await col.find().toArray();
-    } finally {
-        await client.close();
-    }
-}
-
-async function getMonsters() {
-  try {
-      await client.connect();
-      const db = client.db(dbName);
-      const col = db.collection("Monsters");
-      return await col.find().toArray();
-  } finally {
-      await client.close();
-  }
-}
-
-async function getOneMonster(MonsterId) {
-  try {
-    await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection("Monsters");
-    return await col.findOne(MonsterId)
-  } finally {
-    await client.close();
-  }
-}
-
-async function saveMonster() {
-  try {
-    await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection("Monsters");
-    const saveMonster = {MonsterId: Monsters.MonsterId, name: Monsters.name, description: Monsters.description, 
-    locations: [...Monsters.locations], resistances: [...Monsters.resistances], weaknesses: [...Monsters.weaknesses]};
-    return col.insertOne(saveMonster)
-} finally {
-    await client.close();
-}
-}
-
-async function getHunts() {
-  try {
-      await client.connect();
-      const db = client.db(dbName);
-      const col = db.collection("Hunts");
-      return await col.find().toArray();
-  } finally {
-      await client.close();
-  }
-}
-
-async function getUserGreatswords() {
-  try {
-      await client.connect();
-      const db = client.db(dbName);
-      const col = db.collection("Users_Greatswords");
-      return await col.find().toArray();
-  } finally {
-      await client.close();
-  }
-}
-
-async function deleteWeapon(UserGreatswordId) {
-  console.log(UserGreatswordId)
-  try {
-    await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection("Users_Greatswords");
-    col.deleteOne(UserGreatswordId);
-  } finally {
-    client.close();
-  } 
-}
 
 // -----USERS-----//
 //get all users
@@ -163,7 +38,7 @@ app.get('/users', async(req, res) => {
   finally {
     await client.close();
   }
-})
+});
 
 //get user by UserId
 app.get('/user', async(req,res) => {
@@ -171,9 +46,6 @@ app.get('/user', async(req,res) => {
     await client.connect();
     const col = client.db(dbName).collection("Users");
     const query = { UserId: Number(req.query.userid)};
-    console.log(query)
-    console.log(req.query)
-    console.log(req.query.UserId)
    
     const user = await col.findOne(query);
 
@@ -181,13 +53,13 @@ app.get('/user', async(req,res) => {
       res.status(200).send(user);
       return;
     } else {
-      res.status(400).send('not found with id: ' + req.query.userid)
+      res.status(400).send('not found with UserId: ' + req.query.userid)
     }
   }
   finally {
     await client.close();
 }
-})
+});
 
 //register new user
 app.post('/saveUsers', async (req, res) => {
@@ -227,7 +99,7 @@ app.post('/saveUsers', async (req, res) => {
   finally {
     await client.close();
 }
-})
+});
 
 // ----WEAPONS-----//
 //get all weapons
@@ -248,6 +120,27 @@ app.get('/weapons', async (req, res) => {
   finally {
     await client.close();
 }
+});
+
+//get one weapons by GreatswordId
+app.get('/weapon', async (req, res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection('Greatswords');
+    const query = { GreatswordId: Number(req.query.weaponid)};
+    console.log(query)
+    const monster = await col.findOne(query);
+
+    if(monster) {
+      res.status(200).send(monster);
+      return;
+    } else {
+      res.status(400).send('not found with GreatswordId: ' + req.query.weaponid);
+    }
+  }
+  finally {
+    client.close();
+  }
 });
 
 // ----MONSTERS-----//
@@ -293,10 +186,6 @@ app.get('/monster', async (req,res) => {
 });
 
 //save one monster
-// app.post('/monsters/post', (request, response) => {
-// saveMonster(request.body).then(monster => response.send(monster))
-// })
-
 app.post('/savemonster', async (req, res) => {
   try {
     await client.connect();
@@ -331,7 +220,7 @@ app.post('/savemonster', async (req, res) => {
   finally {
     await client.close();
 }
-})
+});
 
 // ----LINKED-TABLES-----//
 //get all hunts
@@ -352,7 +241,7 @@ app.get('/hunts', async(req, res) => {
     finally {
       await client.close();
     }
-})
+});
 
 //get all user_greatswords
 app.get('/user_greatswords', async (req,res) => {
@@ -372,7 +261,7 @@ app.get('/user_greatswords', async (req,res) => {
   finally {
     await client.close();
   }
-})
+});
 
 //post user_greatsword
 app.post('/save_user_greatsword', async (req, res) => {
@@ -407,7 +296,7 @@ app.post('/save_user_greatsword', async (req, res) => {
 finally {
   await client.close();
 }
-})
+});
 
 //delete one user_greatsword
 app.delete('/delete_user_greatsword', async (req, res) => {
@@ -424,13 +313,13 @@ app.delete('/delete_user_greatsword', async (req, res) => {
   finally {
     await client.close();
 }
-})
+});
 
 app.get('/', (req, res) => {
   console.log("Local")
   res.redirect('/info.html')
-})
+});
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
-  })
+  });
