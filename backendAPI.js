@@ -217,7 +217,14 @@ app.post('/saveUsers', async (req, res) => {
     //send back succesmessage
     res.status(201).send(`User saved with UserId ${req.body.UserId}`);
   
-  } finally {
+  } catch(error) {
+    console.log(error)
+    res.status(500).send({
+      error: 'Something went wrong',
+      value: error
+    });
+  }
+  finally {
     await client.close();
 }
 })
@@ -312,10 +319,6 @@ app.get('/hunts', async(req, res) => {
 })
 
 //get all user_greatswords
-// app.get('/user_greatswords', async (_, response) => {
-//   await getUserGreatswords().then(user_greatswords => response.send(user_greatswords))
-// });
-
 app.get('/user_greatswords', async (req,res) => {
   try {
     await client.connect();
@@ -335,10 +338,61 @@ app.get('/user_greatswords', async (req,res) => {
   }
 })
 
+//post user_greatsword
+app.post('/save_user_greatsword', async (req, res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection('Users_Greatswords');
+
+    const newLink = await col.findOne({UserGreatswordId: req.body.UserGreatswordId});
+    if(newLink) {
+      res.status(400).send('Bad request: User_Greatsword already in database with UserGreatswordId: '
+       + req.body.UserGreatswordId);
+      return
+    }
+  
+    let newUser_Greatsword = {
+      GreatswordId: req.body.GreatswordId,
+      UserGreatswordId: req.body.UserGreatswordId,
+      UserId: req.body.UserId
+    }
+
+    let insertResult = await col.insertOne(newUser_Greatsword)
+
+    res.status(201).send(`user_greatsword saved with UserGreatswordId ${req.body.UserGreatswordId}`)
+  
+} catch(error) {
+  console.log(error)
+  res.status(500).send({
+    error: 'Something went wrong',
+    value: error
+  });
+}
+finally {
+  await client.close();
+}
+})
+
 //delete one user_greatsword
-app.delete('/user_greatswords/delete', async (request, response) => {
-  await deleteWeapon(request.params.UserGreatswordId).then(response.sendStatus(200));
-});
+// app.delete('/user_greatswords/delete', async (request, response) => {
+//   await deleteWeapon(request.params.UserGreatswordId).then(response.sendStatus(200));
+// });
+
+app.delete('/delete_user_greatsword', async (req, res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection("Users_Greatswords");
+    const query = { UserGreatswordId: Number(req.query.usergreatswordid)};
+    const user_greatsword = await col.deleteOne(query);
+
+    if(user_greatsword){
+    res.status(200).send('user_greatsword ' + req.query.usergreatswordid + ' deleted')
+    }
+  }
+  finally {
+    await client.close();
+}
+})
 
 app.get('/', (req, res) => {
   console.log("Local")
