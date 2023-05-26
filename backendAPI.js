@@ -145,17 +145,13 @@ async function deleteWeapon(UserGreatswordId) {
 }
 
 // -----USERS-----//
-//Get all users
-// app.get('/users', async (_, response) => {
-//     await getUsers().then(users => response.send(users))
-// });
-
+//get all users
 app.get('/users', async(req, res) => {
   try {
     await client.connect();
     const col = client.db(dbName).collection("Users");
     const users = await col.find({}).toArray();
-    res.status(200).send(users)
+    res.status(200).send(users);
   } 
   catch(error) {
   console.log(error)
@@ -169,12 +165,7 @@ app.get('/users', async(req, res) => {
   }
 })
 
-//Get one user 
-// app.get('/users/:userid', async (request, response) => {
-//   await getOneUser(request.params.UserId).then(user => response.send(user))
-// });
-
-//ONE USER TEST
+//get user by UserId
 app.get('/user', async(req,res) => {
   try{
     await client.connect();
@@ -197,13 +188,7 @@ app.get('/user', async(req,res) => {
 }
 })
 
-//register user
-app.post('/users/register', async (request, response) => {
-  console.log(req.body);
-  registerUser(request.body).then(user => response.send(user))
-});
-
-//NEW POST TEST
+//register new user
 app.post('/saveUsers', async (req, res) => {
   try {
     //connect to db and retrieve the right collection
@@ -238,11 +223,6 @@ app.post('/saveUsers', async (req, res) => {
 
 // ----WEAPONS-----//
 //get all weapons
-// app.get('/weapons', async (_, response) => {
-//     await getWeapons().then(weapons => response.send(weapons))
-// });
-
-//weapons test
 app.get('/weapons', async (req, res) => {
   try {
     await client.connect();
@@ -264,8 +244,28 @@ app.get('/weapons', async (req, res) => {
 
 // ----MONSTERS-----//
 //get all monsters
-app.get('/monsters', async (_, response) => {
-  await getMonsters().then(monsters => response.send(monsters))
+// app.get('/monsters', async (_, response) => {
+//   await getMonsters().then(monsters => response.send(monsters))
+// });
+
+//get all monsters
+app.get('/monster', async (req,res) => {
+  try{
+    await client.connect();
+    const col = client.db(dbName).collection("Monster");
+    const monsters = await col.find({}).toArray();
+    res.status(200).send(monsters);
+  }
+  catch(error) {
+    console.log(error)
+    res.status(500).send({
+    error: 'Something went wrong',
+    value: error
+    });
+    }
+  finally {
+    await client.close();
+  }
 });
 
 //get one monster
