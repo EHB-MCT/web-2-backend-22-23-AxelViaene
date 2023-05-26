@@ -170,7 +170,7 @@ app.get('/user', async(req,res) => {
   try{
     await client.connect();
     const col = client.db(dbName).collection("Users");
-    const query = {UserId: 2};
+    const query = {UserId: req.query.UserId};
     const options = {
       // projection: {_id: 0 }
     };
@@ -274,7 +274,7 @@ app.get('/monsters', async (req,res) => {
 // });
 
 app.get('/monsters/:monsterid', async (request, response) => {
-  await getOneMonster(request.params.MonsterId).then(monster => response.send(monster))
+ 
 });
 
 //save one monster
