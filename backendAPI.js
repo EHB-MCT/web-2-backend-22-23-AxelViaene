@@ -77,9 +77,9 @@ app.post('/saveusers', async (req, res) => {
     // }
 
     //check for duplicates
-    const user = await col.findOne({UserId: req.body.UserId});
+    const user = await col.findOne({UserId: req.body.name});
     if(user) {
-      res.status(400).send('Bad request: User already in database with UserId: ' + req.body.UserId)
+      res.status(400).send('Bad request: User already in database with name: ' + req.body.name)
       return
     }
 
@@ -117,15 +117,15 @@ app.post('/loginuser', async (req, res) => {
       const col = client.db(dbName).collection('Users');
 
       //check for empty fields
-      // if(!req.body.email || !res.body.password){
+      // if(!req.body.name || !res.body.password){
       //   res.status(401).send({
       //     status: "Bad request",
-      //     message: "Some fields are missing: email, password."
+      //     message: "Some fields are missing: name, password."
       //   })
       // }
 
       //check for user in database
-      let user = col.find(element => element.email == req.body.email)
+      let user = col.find(element => element.name == req.body.name)
       console.log(user)
       if(user){
         //compare passwords
@@ -144,7 +144,7 @@ app.post('/loginuser', async (req, res) => {
         //no user found
         res.status(401).send({
               status: "Authentication error",
-              message: "No user with this email has been found."
+              message: "No user with this name has been found."
             })
       }
 
