@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.port || 3000;
+const {v4: uuidv4, validate: uuidValidate} = require('uuid');
 const config = require('./config.json');
 
 //cors
@@ -86,6 +87,7 @@ app.post('/saveusers', async (req, res) => {
     status: "Bad request",
     message: "Some fields are missing: name, email, password."
   })
+  return
   }
 
   try {
@@ -102,7 +104,8 @@ app.post('/saveusers', async (req, res) => {
           name: req.body.name,
           email: req.body.email,
           password: req.body.password,
-          UserId: highestUserId
+          UserId: highestUserId,
+          uuid: uuidv4()
     }
 
     //check for duplicates
@@ -110,7 +113,7 @@ app.post('/saveusers', async (req, res) => {
     if(user) {
       res.status(400).send('Bad request: User already in database with email: ' + req.body.email)
       return
-    }  
+    }
 
     //insert in database
     let insertResult = await col.insertOne(newUser)
@@ -138,6 +141,7 @@ app.post('/loginuser', async (req, res) => {
       status: "Bad request",
       message: "Some fields are missing: email, password."
     })
+    return
     }
 
   try {
@@ -178,6 +182,55 @@ app.post('/loginuser', async (req, res) => {
   finally {
     await client.close();
 }
+})
+
+
+app.post('/verifyuuid', async (req, res) => {
+  //check for empty and faulty uuid
+  if(!req.body.uuid){
+    res.status(401).send({
+    status: "Bad request",
+    message: "uuid is missing."
+  })
+  return
+  } else {
+    if (!uuidValidate(req.body.uuid)) {
+      res.status(401).send({
+        status: "Authentication error",
+        message: "uuid is not a valid uuid."
+      })
+      return
+    }
+  }
+
+try {
+    //connect to db and retrieve the right collection
+    await client.connect();
+    const col = client.db(dbName).collection('Users');
+
+    const query = { uuid: req.body.uuid}
+    const user = await col.findOne(query)
+
+    if(user){
+        res.status(200).send({
+          status: "Authentication succesfull",
+          message: "Your uuid is valid.",
+          data: {
+            name: user.name,
+            email: user.email,
+            uuid: user.uuid
+          }
+        })
+      }else {
+        res.status(401).send({
+          status: "Verify error",
+          message: `No user exists with uuid ${req.body.uuid}`
+        })
+      }
+  }
+  finally {
+  await client.close();
+  }
 })
 
 // ----WEAPONS-----//
