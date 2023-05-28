@@ -163,12 +163,17 @@ app.post('/loginuser', async (req, res) => {
         if(user.password == loginuser.password){
           res.status(200).send({
             status: "Authentication succesfull",
-            message: "Logged in."
+            message: "Logged in.",
+            data: {
+              name: user.name,
+              email: user.email,
+              uuid: user.uuid
+            }
           })
         }else {
           res.status(401).send({
             status: "Authentication error",
-            message: "Wrong password."
+            message: "Password is incorrect."
           })
         }
       } else {
