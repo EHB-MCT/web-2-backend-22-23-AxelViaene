@@ -62,11 +62,19 @@ app.get('/user', async(req,res) => {
 });
 
 //register new user
-app.post('/saveUsers', async (req, res) => {
+app.post('/saveusers', async (req, res) => {
   try {
     //connect to db and retrieve the right collection
     await client.connect();
     const col = client.db(dbName).collection('Users');
+
+    //check for empty fields
+    // if(!req.body.name || !req.body.email || !res.body.password){
+    //   res.status(401).send({
+    //     status: "Bad request",
+    //     message: "Some fields are missing: name, email, password."
+    //   })
+    // }
 
     //check for duplicates
     const user = await col.findOne({UserId: req.body.UserId});
@@ -100,6 +108,51 @@ app.post('/saveUsers', async (req, res) => {
     await client.close();
 }
 });
+
+//login existing user
+app.post('/loginuser', async (req, res) => {
+  try {
+      //connect to db and retrieve the right collection
+      await client.connect();
+      const col = client.db(dbName).collection('Users');
+
+      //check for empty fields
+      // if(!req.body.email || !res.body.password){
+      //   res.status(401).send({
+      //     status: "Bad request",
+      //     message: "Some fields are missing: email, password."
+      //   })
+      // }
+
+      //check for user in database
+      let user = col.find(element => element.email == req.body.email)
+      console.log(user)
+      if(user){
+        //compare passwords
+        if(user.password == req.body.password){
+          res.status(200).send({
+            status: "Authentication succesfull",
+            message: "Logged in."
+          })
+        }else {
+          res.status(401).send({
+            status: "Authentication error",
+            message: "Wrong password."
+          })
+        }
+      } else {
+        //no user found
+        res.status(401).send({
+              status: "Authentication error",
+              message: "No user with this email has been found."
+            })
+      }
+
+  }
+  finally {
+    await client.close();
+}
+})
 
 // ----WEAPONS-----//
 //get all weapons
