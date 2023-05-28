@@ -77,13 +77,13 @@ app.get('/user', async(req,res) => {
 //register new user
 app.post('/saveusers', async (req, res) => {
 
-//check for empty fields
-if(!req.body.name || !req.body.email || !req.body.password){
+  //check for empty fields
+  if(!req.body.name || !req.body.email || !req.body.password){
     res.status(401).send({
     status: "Bad request",
     message: "Some fields are missing: name, email, password."
   })
-}
+  }
 
   try {
     //connect to db and retrieve the right collection
@@ -123,25 +123,32 @@ if(!req.body.name || !req.body.email || !req.body.password){
 
 //login existing user
 app.post('/loginuser', async (req, res) => {
+    //check for empty fields
+    if(!req.body.email || !req.body.password){
+      res.status(401).send({
+      status: "Bad request",
+      message: "Some fields are missing: email, password."
+    })
+    }
+
   try {
       //connect to db and retrieve the right collection
       await client.connect();
+
+      const loginuser = {
+        email: req.body.email,
+        password: req.body.password
+      }
+
       const col = client.db(dbName).collection('Users');
 
-      //check for empty fields
-      // if(!req.body.name || !res.body.password){
-      //   res.status(401).send({
-      //     status: "Bad request",
-      //     message: "Some fields are missing: name, password."
-      //   })
-      // }
+      const query = { email: loginuser.email}
+      const user = await col.findOne(query)
+      console.log(query.email, query)
 
-      //check for user in database
-      let user = col.find(element => element.name == req.body.name)
-      console.log(user)
       if(user){
         //compare passwords
-        if(user.password == req.body.password){
+        if(user.password == loginuser.password){
           res.status(200).send({
             status: "Authentication succesfull",
             message: "Logged in."
@@ -156,10 +163,9 @@ app.post('/loginuser', async (req, res) => {
         //no user found
         res.status(401).send({
               status: "Authentication error",
-              message: "No user with this name has been found."
+              message: "No user with this email has been found."
             })
       }
-
   }
   finally {
     await client.close();
