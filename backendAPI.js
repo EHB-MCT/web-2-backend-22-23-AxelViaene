@@ -24,6 +24,9 @@ app.get('/testMongo', async (req ,res) => {
     await client.connect();
     const col = client.db(dbName).collection("Users");
     const users = await col.find({}).toArray();
+    const UserIds = users.map(user => user.UserId);
+    const highestUserId = Math.max(...UserIds);
+    console.log(highestUserId+1)
 
     res.status(200).send(users);
   } finally {
@@ -89,11 +92,17 @@ app.post('/saveusers', async (req, res) => {
     //connect to db and retrieve the right collection
     await client.connect();
     const col = client.db(dbName).collection('Users'); 
+    
+    //getting highest UserId from database
+    const users = await col.find({}).toArray();
+    const UserIds = users.map(user => user.UserId);
+    const highestUserId = Math.max(...UserIds)+1;
+
     const newUser = {
           name: req.body.name,
           email: req.body.email,
           password: req.body.password,
-          UserId: req.body.UserId
+          UserId: highestUserId
     }
 
     //check for duplicates
@@ -106,7 +115,7 @@ app.post('/saveusers', async (req, res) => {
     //insert in database
     let insertResult = await col.insertOne(newUser)
     //send back succesmessage
-    res.status(201).send(`User saved with UserId ${req.body.UserId}`);
+    res.status(201).send(`User saved with UserId ${highestUserId}`);
 
   
   } catch(error) {
@@ -144,7 +153,6 @@ app.post('/loginuser', async (req, res) => {
 
       const query = { email: loginuser.email}
       const user = await col.findOne(query)
-      console.log(query.email, query)
 
       if(user){
         //compare passwords
