@@ -18,6 +18,18 @@ const client = new MongoClient(config.finalUrl);
 const dbName = 'API_Structuur'
 
 
+//TEST ROUTE
+app.get('testMongo', async (req ,res) => {
+  try {
+    const col = client.db(dbName).collection("Users");
+    const users = await col.find({}).toArray();
+
+    res.status(200).send(users);
+  } finally {
+    await client.close();
+  }
+})
+
 
 // -----USERS-----//
 //get all users
