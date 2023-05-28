@@ -167,7 +167,8 @@ app.post('/loginuser', async (req, res) => {
             data: {
               name: user.name,
               email: user.email,
-              uuid: user.uuid
+              uuid: user.uuid,
+              UserId: user.UserId
             }
           })
         }else {
