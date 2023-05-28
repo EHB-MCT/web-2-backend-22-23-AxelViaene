@@ -78,8 +78,8 @@ app.get('/user', async(req,res) => {
 app.post('/saveusers', async (req, res) => {
 
 //check for empty fields
-if(!req.body.name || !req.body.email || !res.body.password){
-  res.status(401).send({
+if(!req.body.name || !req.body.email || !req.body.password){
+    res.status(401).send({
     status: "Bad request",
     message: "Some fields are missing: name, email, password."
   })
@@ -88,30 +88,26 @@ if(!req.body.name || !req.body.email || !res.body.password){
   try {
     //connect to db and retrieve the right collection
     await client.connect();
-    const col = client.db(dbName).collection('Users');
-
-    //create new user object
-    let newUser = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      UserId: req.body.UserId
+    const col = client.db(dbName).collection('Users'); 
+    const newUser = {
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          UserId: req.body.UserId
     }
 
     //check for duplicates
-    const user = await col.findOne({UserId: req.body.name});
+    const user = await col.findOne({email: req.body.email});
     if(user) {
-      res.status(400).send('Bad request: User already in database with name: ' + req.body.name)
+      res.status(400).send('Bad request: User already in database with email: ' + req.body.email)
       return
-    } else {
-      //insert in database
-    let insertResult = await col.insertOne(newUser)
+    }  
 
+    //insert in database
+    let insertResult = await col.insertOne(newUser)
     //send back succesmessage
     res.status(201).send(`User saved with UserId ${req.body.UserId}`);
-    }
 
-    
   
   } catch(error) {
     console.log(error)
