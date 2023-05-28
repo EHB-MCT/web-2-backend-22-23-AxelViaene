@@ -19,7 +19,7 @@ const dbName = 'API_Structuur'
 
 
 //TEST ROUTE
-app.get('testMongo', async (req ,res) => {
+app.get('/testMongo', async (req ,res) => {
   try {
     const col = client.db(dbName).collection("Users");
     const users = await col.find({}).toArray();
