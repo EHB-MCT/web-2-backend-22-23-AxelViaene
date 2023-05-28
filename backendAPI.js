@@ -76,25 +76,19 @@ app.get('/user', async(req,res) => {
 
 //register new user
 app.post('/saveusers', async (req, res) => {
+
+//check for empty fields
+if(!req.body.name || !req.body.email || !res.body.password){
+  res.status(401).send({
+    status: "Bad request",
+    message: "Some fields are missing: name, email, password."
+  })
+}
+
   try {
     //connect to db and retrieve the right collection
     await client.connect();
     const col = client.db(dbName).collection('Users');
-
-    //check for empty fields
-    // if(!req.body.name || !req.body.email || !res.body.password){
-    //   res.status(401).send({
-    //     status: "Bad request",
-    //     message: "Some fields are missing: name, email, password."
-    //   })
-    // }
-
-    //check for duplicates
-    const user = await col.findOne({UserId: req.body.name});
-    if(user) {
-      res.status(400).send('Bad request: User already in database with name: ' + req.body.name)
-      return
-    }
 
     //create new user object
     let newUser = {
@@ -104,11 +98,20 @@ app.post('/saveusers', async (req, res) => {
       UserId: req.body.UserId
     }
 
-    //insert in database
+    //check for duplicates
+    const user = await col.findOne({UserId: req.body.name});
+    if(user) {
+      res.status(400).send('Bad request: User already in database with name: ' + req.body.name)
+      return
+    } else {
+      //insert in database
     let insertResult = await col.insertOne(newUser)
 
     //send back succesmessage
     res.status(201).send(`User saved with UserId ${req.body.UserId}`);
+    }
+
+    
   
   } catch(error) {
     console.log(error)
