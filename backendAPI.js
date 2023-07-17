@@ -260,7 +260,7 @@ app.get('/weapons', async (req, res) => {
 }
 });
 
-//get one weapons by GreatswordId
+//get one weapon by GreatswordId
 app.get('/weapon', async (req, res) => {
   try {
     await client.connect();
@@ -379,6 +379,43 @@ app.get('/hunts', async(req, res) => {
       await client.close();
     }
 });
+
+//save new hunt
+app.post('save_hunt', async (req, res) => {
+  try {
+    await client.connect();
+    const col = client.db(dbName).collection('Hunts');
+
+    //getting highest HuntId from database
+    const hunts = await col.find({}).toArray();
+    const HuntIds = hunts.map(hunt => hunt.HuntId);
+    const highestHuntId = Math.max(...HuntIds)+1;
+
+    const newHunt = {
+      UserId: req.body.UserId,
+      MonsterId: req.body.MonsterId,
+      GreatswordId: req.body.GreatswordId,
+      location: req.body.location,
+      HuntId: highestHuntId
+    }
+
+     //insert in database
+     let insertResult = await col.insertOne(newHunt)
+     //send back succesmessage
+     res.status(201).send(`Hunt saved with HuntId ${highestHuntId}`);
+  }
+
+  catch(error) {
+    console.log(error)
+    res.status(500).send({
+      error: 'Something went wrong',
+      value: error
+    });
+  }
+  finally {
+    await client.close();
+}
+})
 
 //get all user_greatswords
 app.get('/user_greatswords', async (req,res) => {
