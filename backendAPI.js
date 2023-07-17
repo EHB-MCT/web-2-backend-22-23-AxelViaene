@@ -381,7 +381,7 @@ app.get('/hunts', async(req, res) => {
 });
 
 //save new hunt
-app.post('save_hunt', async (req, res) => {
+app.post('/save_hunt', async (req, res) => {
   try {
     await client.connect();
     const col = client.db(dbName).collection('Hunts');
