@@ -489,6 +489,30 @@ app.delete('/delete_user_greatsword', async (req, res) => {
 }
 });
 
+//delete one user_greatsword based on userId & greatswordId
+app.delete('/delete_UGS_by_id', async (req, res) => {
+  try {
+    const UserId = req.query.UserId
+    const GreatswordId = req.query.GreatswordId
+    await client.connect()
+    const col = client.db(dbName).collection("Users_Greatswords")
+
+    const query = { UserId: UserId, GreatswordId: GreatswordId }
+    const user_greatsword = await col.deleteOne(query)
+
+    if (user_greatsword.deletedCount > 0) {
+      res.status(200).send(`user_greatsword with UserId ${UserId} and GreatswordId ${GreatswordId} deleted`);
+    } else {
+      res.status(404).send(`No user_greatsword found with UserId ${UserId} and GreatswordId ${GreatswordId}`);
+    }
+  } catch (error) {
+    console.error('An error occurred while deleting the user_greatsword:', error)
+    res.status(500).send('An error occurred while deleting the user_greatsword')
+  } finally {
+    await client.close()
+  }
+})
+
 app.get('/', (req, res) => {
   console.log("Local")
   res.redirect('/info.html')
