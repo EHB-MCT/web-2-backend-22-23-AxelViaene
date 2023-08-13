@@ -14,25 +14,31 @@
     <p>GET / = root page (this page)</p>
     <ul>
         <h2>USERS</h2>
-        <li>GET /users = get all users</li>
-        <li>GET /users/:userid = get one user</li>
-        <li>POST /users/register = register user</li>
+        <li>GET Get all users /users</li>
+        <li>GET Get one user /user?userid=&lt;id&gt;</li>
+        <li>POST Register user /saveusers</li>
+        <li>POST Login user /loginuser</li>
     </ul>
     <ul>
         <h2>WEAPONS</h2>
-        <li>GET /weapons = get all weapons</li>
+        <li>GET Get all weapons /weapons</li>
+        <li>GET Get one weapon /weapon?weaponid=&lt;id&gt;</li>
     </ul>
     <ul>
         <h2>MONSTERS</h2>
-        <li>GET /monsters = get all monsters</li>
-        <li>GET /users/:monsterid = get one monster</li>
-        <li>POST /users/post = save one monster</li>
+        <li>GET Get all monsters /monsters</li>
+        <li>GET Get one monster /monster?monsterid=&lt;id&gt;</li>
+        <li>POST Save one monster /savemonster</li>
     </ul>
     <ul>
         <h2>LINKED TABLES</h2>
-        <li>GET /hunts = get all hunts</li>
-        <li>GET /user_greatswords = get all user_greatswords</li>
-        <li>DELETE /user_greatswords/delete = delete one user_greatswords</li>
+        <li>GET Get all hunts /hunts</li>
+        <li>POST save one hunt /save_hunt</li>
+        <li>GET Get all user_greatswords /user_greatswords</li>
+        <li>POST Save one user_greatsword /save_user_greatsword</li>
+        <li>DELETE Delete one user_greatswords /delete_user_greatsword?usergreatswordid=&lt;id&gt;</li>
+        <li>DELETE Delete one user_greatswords if no user_greatsword_id available
+            /delete_user_greatsword?UserId=&lt;id&gt;&GreatswordId=&lt;id&gt;</li>
     </ul>
 </body>
 
